@@ -76,8 +76,8 @@ def reply_text(token,id,txt):
   elif txt in "light" or txt in "點燈":
     ask = ButtonsTemplate(
     text="點亮LED燈選單", 
-    actions=[MessageAction(label="開燈", text="1/tmlin/st00/led/14/1"),
-             MessageAction(label="關燈", text="1/tmlin/st00/led/14/0"),
+    actions=[MessageAction(label="開燈", text="1/tmlin/st00/led/14/value/1"),
+             MessageAction(label="關燈", text="1/tmlin/st00/led/14/value/0"),
              MessageAction(label="取消", text="Cancel")])
     temp_msg = TemplateSendMessage(alt_text='點燈訊息',template=ask)
     line_bot_api.reply_message(token, temp_msg) 
@@ -111,7 +111,8 @@ def led():
   id=request.args.get("id")
   sw=request.args.get("sw")
   if id and sw:
-    putFirebase("Board","LEDs/"+id,sw)
+    message=f"1/tmlin/st00/led/{id}/value/{sw}" 
+    client.publish(topic,message)  
     return "開燈" if sw=="1" else "關燈"
   return "格式錯誤?"
 
