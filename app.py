@@ -5,7 +5,7 @@ import os,random
 import paho.mqtt.client as mqtt
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
 client = mqtt.Client(client_id)
-client.connect("broker.mqttdashboard.com", 1883, 60)
+client.connect("broker.mqttdashboard.com", 1883)
 topic="20230313/ESP32/AIOT"
 app = Flask(__name__)
 
