@@ -1,9 +1,10 @@
 #Flask初始化
 from flask import Flask, send_from_directory, request, abort
 from datetime import datetime
-import os
+import os,random
 import paho.mqtt.client as mqtt
-client = mqtt.Client()
+client_id = f'python-mqtt-{random.randint(0, 1000)}'
+client = mqtt.Client(client_id)
 client.connect("broker.mqttdashboard.com", 1883, 60)
 topic="20230313/ESP32/AIOT"
 app = Flask(__name__)
@@ -15,8 +16,8 @@ def listener(event):
   print(event.data)  
   print("資料型別: ",end="")
   print(type(event.data))
-  if event.path=="/36": 
-    line_bot_api.push_message("Ud903f9000fafd94f9ac23387217f78de",TextSendMessage(text="感測器:"+str(event.data)))
+  #if event.path=="/36": 
+  #   line_bot_api.push_message("Ud903f9000fafd94f9ac23387217f78de",TextSendMessage(text="感測器:"+str(event.data)))
 
 #Line初始化  
 from linebot import LineBotApi, WebhookHandler
@@ -87,7 +88,7 @@ def reply_text(token,id,txt):
   elif txt=="xvr36":
     client.publish(topic,"1/tmlin/st00/vr/36/detect/0")     
     line_bot_api.reply_message(token, TextSendMessage(text="關閉感測器"))
-  elif txt=="Hotel":
+  elif txt=="hotel":
     #line_bot_api.push_message(id,FlexSendMessage(alt_text='hello',contents=flex_contents))  
     line_bot_api.push_message(id,flex_send_message)
   else:
