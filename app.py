@@ -11,7 +11,7 @@ app.config['MQTT_USERNAME'] = ''  # set the username here if you need authentica
 app.config['MQTT_PASSWORD'] = ''  # set the password here if the broker demands authentication
 app.config['MQTT_KEEPALIVE'] = 5  # set the time interval for sending a ping to the broker to 5 seconds
 app.config['MQTT_TLS_ENABLED'] = False 
-mqtt=Mqtt(app)
+mqtt=Mqtt(app,connect_async=True)
 def listener(event):
   print("事件型別: "+event.event_type)  #'put' or 'patch'
   print("事件路徑: "+event.path) 
