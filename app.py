@@ -17,8 +17,6 @@ client.on_connect = on_connect
 client.on_message = on_message
 client.connect("broker.mqttdashboard.com", 1883, 60)
 topic="20230313/ESP32/AIOT"
-client.loop_forever()
-
 
     
 def listener(event):
