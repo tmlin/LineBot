@@ -3,14 +3,7 @@ from flask import Flask, send_from_directory, request, abort
 from datetime import datetime
 import os,random
 import paho.mqtt.client as mqtt
-client_id=f"tmlin-{random.randint(0,10000)}"
-client = mqtt.Client(client_id)
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect("broker.mqttdashboard.com", 1883, 60)
-topic="20230313/ESP32/AIOT"
 app = Flask(__name__)
-client.loop_forever()
 
 def on_connect(client, userdata, flags, rc):
   print("Connected with result code "+str(rc))
@@ -18,6 +11,15 @@ def on_message(client, userdata, msg):
   print(msg.topic+" "+str(msg.payload))
 def publish(topic,message):
   client.publish(topic,message)   
+client_id=f"tmlin-{random.randint(0,10000)}"
+client = mqtt.Client(client_id)
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("broker.mqttdashboard.com", 1883, 60)
+topic="20230313/ESP32/AIOT"
+client.loop_forever()
+
+
     
 def listener(event):
   print("事件型別: "+event.event_type)  #'put' or 'patch'
