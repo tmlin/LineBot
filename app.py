@@ -1,21 +1,23 @@
 #Flask初始化
 from flask import Flask, send_from_directory, request, abort
-from flask_mqtt import Mqtt
 from datetime import datetime
-import os
+import os,random
+import paho.mqtt.client as mqtt
+client_id=f"tmlin-{random.randint(0,10000)}"
+client = mqtt.Client(client_id)
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("broker.mqttdashboard.com", 1883, 60)
 topic="20230313/ESP32/AIOT"
 app = Flask(__name__)
-app.config['MQTT_BROKER_URL'] = "broker.mqttdashboard.com"  # use the free broker from HIVEMQ
-app.config['MQTT_BROKER_PORT'] = 1883  # default port for non-tls connection
-app.config['MQTT_USERNAME'] = ''  # set the username here if you need authentication for the broker
-app.config['MQTT_PASSWORD'] = ''  # set the password here if the broker demands authentication
-app.config['MQTT_KEEPALIVE'] = 5  # set the time interval for sending a ping to the broker to 5 seconds
-app.config['MQTT_TLS_ENABLED'] = False 
-mqtt=Mqtt(app)
+client.loop_forever()
 
+def on_connect(client, userdata, flags, rc):
+  print("Connected with result code "+str(rc))
+def on_message(client, userdata, msg):
+  print(msg.topic+" "+str(msg.payload))
 def publish(topic,message):
-  mqtt=Mqtt(app)
-  mqtt.publish(topic,message)   
+  client.publish(topic,message)   
     
 def listener(event):
   print("事件型別: "+event.event_type)  #'put' or 'patch'
@@ -77,7 +79,7 @@ def reply_text(token,id,txt):
   elif "led" in txt:
     args=txt.split("/")
     if len(args)==7:
-      mqtt.publish(topic,txt)
+      publish(topic,txt)
       value="開燈" if args[6]=="1" else "關燈"
     else:
       value="格式錯誤?"       
@@ -91,10 +93,10 @@ def reply_text(token,id,txt):
     temp_msg = TemplateSendMessage(alt_text='點燈訊息',template=ask)
     line_bot_api.reply_message(token, temp_msg) 
   elif txt=="vr36":
-    mqtt.publish(topic,"1/tmlin/st00/vr/36/detect/1")
+    publish(topic,"1/tmlin/st00/vr/36/detect/1")
     line_bot_api.reply_message(token, TextSendMessage(text="啟動感測器"))
   elif txt=="xvr36":
-    mqtt.publish(topic,"1/tmlin/st00/vr/36/detect/0")     
+    publish(topic,"1/tmlin/st00/vr/36/detect/0")     
     line_bot_api.reply_message(token, TextSendMessage(text="關閉感測器"))
   elif txt=="hotel":
     #line_bot_api.push_message(id,FlexSendMessage(alt_text='hello',contents=flex_contents))  
@@ -121,7 +123,6 @@ def led():
   sw=request.args.get("sw")
   if id and sw:
     message=f"1/tmlin/st00/led/{id}/value/{sw}" 
-    #mqtt.publish(topic,message)  
     publish(topic,message)
     return "開燈" if sw=="1" else "關燈"
   return "格式錯誤?"
