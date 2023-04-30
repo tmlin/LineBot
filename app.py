@@ -14,8 +14,7 @@ app.config['MQTT_TLS_ENABLED'] = False
 mqtt=Mqtt(app)
 
 def publish(topic,message):
-  if not mqtt:
-    mqtt=Mqtt(app)
+  mqtt=Mqtt(app)
   mqtt.publish(topic,message)   
     
 def listener(event):
